@@ -2,10 +2,10 @@
   "bindings": [
     {
       "type": "eventHubTrigger",
-      "name": "DIAG_ENDPOINT",
+      "name": "diagnostics",
       "direction": "in",
       "path": "d2c-diagnostics",
-      "connection": "d2c-diagnostics",
+      "connection": "DIAG_ENDPOINT",
       "consumerGroup": "$Default"
     }
   ],
