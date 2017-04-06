@@ -11,7 +11,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 public static void Run(EventData myEventHubMessage, TraceWriter log)
 {
     TelemetryClient telemetry = new TelemetryClient();
-    telemetry.InstrumentationKey = GetEnvironmentVariable("APP_INSIGHTS_INSTRUMENTATION_KEY");
+    telemetry.InstrumentationKey = System.Environment.GetEnvironmentVariable("APP_INSIGHTS_INSTRUMENTATION_KEY");
 
     Dictionary<string,string> diagnostics = new Dictionary<string,string>();
     foreach(KeyValuePair<string, object> entry in myEventHubMessage.Properties) {
