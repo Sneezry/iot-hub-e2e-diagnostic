@@ -2,7 +2,7 @@
   "bindings": [
     {
       "type": "eventHubTrigger",
-      "name": "diagnostics",
+      "name": "d2cMessage",
       "direction": "in",
       "path": "d2c-diagnostics",
       "connection": "DIAG_ENDPOINT",
