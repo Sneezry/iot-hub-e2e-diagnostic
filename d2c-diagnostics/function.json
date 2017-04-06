@@ -1,0 +1,13 @@
+{
+  "bindings": [
+    {
+      "type": "eventHubTrigger",
+      "name": "DIAG_ENDPOINT",
+      "direction": "in",
+      "path": "d2c-diagnostics",
+      "connection": "d2c-diagnostics",
+      "consumerGroup": "$Default"
+    }
+  ],
+  "disabled": false
+}
