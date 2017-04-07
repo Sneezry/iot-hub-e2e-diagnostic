@@ -2,38 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "resourceLocation": {
-            "type": "string",
-            "allowedValues": [
-                "East Asia",
-                "Southeast Asia",
-                "Central US",
-                "East US",
-                "East US 2",
-                "West US",
-                "North Central US",
-                "South Central US",
-                "North Europe",
-                "West Europe",
-                "Japan West",
-                "Japan East",
-                "Brazil South",
-                "Australia East",
-                "Australia Southeast",
-                "Central India",
-                "West India",
-                "South India",
-                "Canada Central",
-                "Canada East",
-                "West Central US",
-                "West US 2",
-                "UK South",
-                "UK West",
-                "Korea Central",
-                "Korea South"
-            ],
-            "defaultValue": "East Asia"
-        },
         "iotHubName": {
             "type": "string"
         },
@@ -65,11 +33,12 @@
             }
         },
         "repoUrl": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "https://github.com/VSChina/iot-hub-e2e-diagnostic"
         }
     },
     "variables": {
-        "resourceLocation": "[parameters('resourceLocation')]",
+        "resourceLocation": "[resourceGroup().location]",
         "iotHubName": "[parameters('iotHubName')]",
         "iotHubSku": "[parameters('iotHubSku')]",
         "iotHubCapacity": "[parameters('iotHubCapacity')]",
