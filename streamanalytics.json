@@ -1,0 +1,105 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.1.0.0",
+  "parameters": {
+    "streamAnalyticsJobName": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 63,
+      "metadata": {
+        "description": "Stream Analytics Job Name, can contain alphanumeric characters and hypen and must be 3-63 characters long"
+      }
+    },
+    "numberOfStreamingUnits": {
+      "type": "int",
+      "minValue": 1,
+      "maxValue": 48,
+      "allowedValues": [
+        1,
+        3,
+        6,
+        12,
+        18,
+        24,
+        30,
+        36,
+        42,
+        48
+      ],
+      "metadata": {
+        "description": "Number of Streaming Units"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.StreamAnalytics/StreamingJobs",
+      "apiVersion": "2016-03-01",
+      "name": "[parameters('streamAnalyticsJobName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "sku": {
+          "name": "standard"
+        },
+        "outputErrorPolicy": "stop",
+        "eventsOutOfOrderPolicy": "adjust",
+        "eventsOutOfOrderMaxDelayInSeconds": 0,
+        "eventsLateArrivalMaxDelayInSeconds": 5,
+        "dataLocale": "en-US",
+        "inputs": [
+            {
+                "name": "input",
+                "properties":{
+                    "type":"stream",
+                    "serialization":{
+                        "type":"JSON",
+                        "properties":{
+                            "encoding":"UTF8"
+                        }  
+                    },  
+                    "datasource":{
+                        "type":"Microsoft.Devices/IotHubs",
+                        "properties":{
+                            "iotHubNamespace":"zhe-iot-hub-2",
+                            "sharedAccessPolicyName":"iothubowner",
+                            "sharedAccessPolicyKey":"xxx",
+                            "endpoint": "messages/events",
+                            "consumerGroupName":"arm"
+                        }  
+                    }  
+                }  
+            }
+        ],
+        "outputs": [
+            {
+                "name": "diag",
+                "properties":{
+                    "serialization":{
+                        "type":"JSON",
+                        "properties":{
+                            "encoding":"UTF8"
+                        }
+                    },
+                    "datasource":{
+                        "type":"Microsoft.ServiceBus/EventHub",
+                        "properties":{
+                            "serviceBusNamespace":"zhe-iot-event-hub",
+                            "sharedAccessPolicyName":"RootManageSharedAccessKey",
+                            "sharedAccessPolicyKey":"xxx",  
+                            "eventHubName":"temp-diagnostics"
+                        }
+                    }
+                }
+            }
+        ],
+        "transformation": {
+          "name": "Transformation",
+          "properties": {
+            "streamingUnits": "[parameters('numberOfStreamingUnits')]",
+            "query": "WITH \nMessages AS \n(\n    SELECT\n        [x-before-send-request] AS BeforeSendRequest,\n        [EventEnqueuedUtcTime],\n        [EventProcessedUtcTime],\n        SUBSTRING(IoTHub.CorrelationId, 16, 36) AS CorrelationId,\n        SUBSTRING(IoTHub.MessageId, 12, 36)  AS MessageId,\n        [temperature-fahrenheit] AS Temperature,\n        CASE WHEN DATEDIFF(millisecond, [x-before-send-request], [EventEnqueuedUtcTime]) < 0 THEN 0 ELSE DATEDIFF(millisecond, [x-before-send-request], [EventEnqueuedUtcTime]) END AS Latency0,\n        CASE WHEN DATEDIFF(millisecond, [EventEnqueuedUtcTime], [EventProcessedUtcTime]) < 0 THEN 0 ELSE DATEDIFF(millisecond, [EventEnqueuedUtcTime], [EventProcessedUtcTime]) END AS Latency1,\n        System.TIMESTAMP AS SystemTimestamp,\n        CASE WHEN ([temperature-fahrenheit] IS NULL) or ([temperature-fahrenheit] = \"\") THEN '0' ELSE '1' END AS Success,\n        [PartitionId],\n        [x-device-id] AS DeviceId,\n        IotHub.ConnectionDeviceGenerationId AS ConnectionDeviceGenerationId,\n        IoTHub.ConnectionDeviceId AS ConnectionDeviceId\n    FROM\n        [input]\n)\n\nSELECT * INTO [diag] FROM [Messages]"
+          }
+        }
+      }
+    }
+  ]
+}
