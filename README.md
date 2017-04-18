@@ -1,2 +1,1 @@
-[![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://raw.githubusercontent.com/Sneezry/iot-hub-e2e-diagnostic/master/azuredeploy.json)
-
+[![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FSneezry%2Fiot-hub-e2e-diagnostic%2Fmaster%2Fazuredeploy.json)
